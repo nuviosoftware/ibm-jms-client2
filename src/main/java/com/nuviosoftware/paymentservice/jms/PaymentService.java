@@ -24,13 +24,14 @@ public class PaymentService {
         // receive message
         TextMessage textMessage = (TextMessage) message;
         final String textMessageBody = textMessage.getText();
-        log.info("Payment Service received message: {}", textMessageBody);
+        log.info("### 2 ### Payment Service received message: {} with correlationId: {}", textMessageBody, textMessage.getJMSCorrelationID());
 
         // some random logic to complete the order (80% of times it returns true)
         Random random = new Random();
         String orderCompleted = (random.nextInt(101) >= 20) ? "payment_ok" : "payment_failed";
 
         // send response
+        log.info("### 3 ### Payment Service sending response");
         MQQueue orderRequestQueue = new MQQueue("ORDER.RESPONSE");
         jmsTemplate.convertAndSend(orderRequestQueue, orderCompleted, responseMessage -> {
             responseMessage.setJMSCorrelationID(textMessage.getJMSCorrelationID());
